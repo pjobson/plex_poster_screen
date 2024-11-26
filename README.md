@@ -1,6 +1,6 @@
 # Plex Poster Screen
 
-![Night of the Living Dead](https://github.com/pjobson/plex_poster_screen/blob/main/pics/NOTLD%20-%20Full%201.jpg?raw=true "Night of the Living Dead" =250x)
+![Night of the Living Dead](https://github.com/pjobson/plex_poster_screen/blob/main/pics/NOTLD%20-%20Full%201.jpg?raw=true "Night of the Living Dead")
 
 Pics: https://github.com/pjobson/plex_poster_screen/tree/main/pics
 
