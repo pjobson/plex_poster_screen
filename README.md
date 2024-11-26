@@ -1,20 +1,23 @@
 # Plex Poster Screen
 
+![Night of the Living Dead](https://github.com/pjobson/plex_poster_screen/blob/main/pics/NOTLD%20-%20Full%201.jpg?raw=true "Night of the Living Dead" =250x)
+
+Pics: https://github.com/pjobson/plex_poster_screen/tree/main/pics
+
 ## Introduction
 
 This project displays media from whatever is playing in PLEX on
-a small screen under my TV.  When nothing is playing, it plays
-media which has already been downloaded.
+a small screen under my TV. When nothing is playing, it shows
+media that has already been downloaded.
 
 You'll need a basic understanding of Linux and an interest in
-doing dumb stuff with old junk.  These aren't instructions
-as to how to do this, it is more of a summary of how I did
-it.
+doing quirky stuff with old hardware. These aren't instructions
+on how to do this—it's more of a summary of how I did it.
 
-Yes, I'm happy to chat with you about your stuff and your projects.
-No, I'm not willing to answer angry messages about how my crappy
-scripts don't work for you, I have zero tollerance for this and
-I will report bad behavior to github abuse.
+Yes, I'm happy to chat with you about your ideas and projects.
+No, I'm not willing to respond to angry messages about how my
+scripts don't work for you. I have zero tolerance for this and
+will report bad behavior to GitHub abuse.
 
 ## Thanks / Inspired By
 
@@ -30,25 +33,25 @@ controlled Plex Server.
 
 There are two computers: Frame PC and Plex Server.
 
-There's two folders on the Frame PC, one which is **active** and
-one which is **archive**.  The Plex Server will periodically check
-what is playing via the API.
+There are two folders on the Frame PC: one **active** and one
+**archive**. The Plex Server periodically checks what is playing
+via the API.
 
-If a TV Show or Movie is playing, it will automatically download
-media from the Plex API, then push it to the active folder, then
+If a TV show or movie is playing, it will automatically download
+media from the Plex API, push it to the active folder, and
 restart the `feh` script on the Frame PC.
 
 If nothing is playing, it will move whatever is in the active
 folder into the archive folder, then restart the `feh` script.
 
-The `feh` script checks the active folder, if empty, it uses
-the archive folder.
+The `feh` script checks the active folder. If it's empty, it
+uses the archive folder.
 
-The project was built mainly with low budget stuff laying around
-my house.
+This project was built mostly with low-budget items I had lying
+around my house.
 
 Finally, yes, I am mostly terrible at writing BASH scripts. If
-you want to clean up my crap, I will accept pull requests.
+you want to clean up my mess, I will gladly accept pull requests.
 
 ## Frame PC
 
@@ -73,6 +76,7 @@ you want to clean up my crap, I will accept pull requests.
     ------
     - Flat Slim FPV HDMI Right-Angle to Straight HDMI
     - Flat Slim FPV USB Micro Right Angle to Straight USB A
+    - MHF4 IPEX Antennas
 
     Frame
     -----
@@ -80,7 +84,8 @@ you want to clean up my crap, I will accept pull requests.
     - ¼-inch Foam Core
     - black velvet fabric
     - 3M spray glue
-    - Kapton tape
+    - 3M heavy duty double sided tape
+    - Piece of stiff plastic.
 
 ## Basic Setup
 
@@ -88,7 +93,12 @@ Install your Linux operating system with auto-login enabled and
 setup SSH, so you can get into the unit without having to use
 the tiny screen.
 
-I leave my display on standard view and just turn it 90-degrees.
+You'll want to add your user's ssh key from your Plex Server into
+your Frame PC.
+
+    ssh-copy-id -i ~/.ssh/id_rsa.pub frame_pc_ip_address
+
+I leave my display on standard view and just rotate it 90-degrees.
 
 ### Frame PC
 
@@ -116,28 +126,33 @@ Yes, aside from your base system, that's it!
 8. Install foam core velvet side to the glass.
 9. Clean the monitor.
 10. Install the monitor into the foam core.
-11. I covered the back of my monitor with Kapton tape,
-    you can use a plastic film and tape. Just make sure it is isolated
-    from the motherboard.
+11. I used some Sugru to hold the monitor in place.
 12. Install right-angle cables into screen.
-13. Install the motherboard, you'll have to figure out how to mount
-    yours, I made a bracket out of some of the foam core.
-14. Make a hole in the back of the board of the shadow box.
+13. I used a bit of thin scrap plastic to isolate the motherboard
+    from the screen, so it wouldn't short.
+14. Install the motherboard, I 3M taped it to the backboard of the
+    shadowbox.
+15. Install the antennas on the motherboard.
+16. Make a hole in the backboard of the shadow box.
     I put mine near the power button, so I can reach in and turn
     it off or on.
-15. Run the power cable through the hole, plug it in and turn it on.
+17. Run your power cable and antennas through the backboard hole.
+18. Plug it in and turn it on.
 
 ## Plex Server
 
-The Plex Server has a cronjob which runs every 3 minutes.
+The Plex Server has a cronjob which runs as my user every 3 minutes.
 
-    */3 * * * * /home/pjobson/bin/push-posters-to-stantz.sh >/dev/null 2>&1
+    */3 * * * * /home/pjobson/bin/push-posters.sh >/dev/null 2>&1
+               #^ change this path
 
-This is called `push-posters-to-stantz.sh` on mine, because my Frame
-is named `stantz`.
+This is called `push-posters.sh`.
 
 You'll need to edit this file changing:
 
+* `SCREEN_WIDTH` - Your screen width.
+* `SCREEN_HEIGHT` - Your screen height.
+* `IMAGE_ROTATION` - Direction to rotate poster.
 * `PLEX_TOKEN` - [Your Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
 * `PLEX_HOST` - Name of your plex server or it's IP address
 * `PLEX_USER` - Your Plex username
@@ -150,12 +165,43 @@ You'll need to edit this file changing:
 * `REMOTE_BIN_PATH` - This is the location where your `feh_startup.sh`
   script will be stored.
 
-On my setup, I
+**Note:** The `REMOTE_PICS_PLEX_PATH` shouldn't be a subdirectory
+of `REMOTE_PICS_DEFAULT_PATH`.  My configuration is:
 
-## Poster Screen
+    SCREEN_WIDTH="800"
+    SCREEN_HEIGHT="480"
+    IMAGE_ROTATION="-90"
 
-    feh_startup.sh
+    LOCAL_PICS_PATH="/dvr/media/pictures/PLEX"
 
-### `crontab`
+    REMOTE_SCREEN_HOSTNAME="stantz"
+    REMOTE_PICS_DEFAULT_PATH="/home/pjobson/Pictures/FRAME"
+    REMOTE_PICS_PLEX_PATH="/home/pjobson/Pictures/PLEX"
+    REMOTE_BIN_PATH="/home/pjobson/bin"
+
+I have a seperate drive mounted to: `/home/pjobson/Pictures`
+
+    /dev/sda1 on /home/pjobson/Pictures type ext4 (rw,relatime)
+
+## Frame PC
+
+The Frame PC has a cronjob for my user which runs every 3 minutes.
 
     */15 * * * * /home/pjobson/bin/feh_startup.sh >/dev/null 2>&1
+                #^ change this path
+
+I also have a cronjob which runs as root every 6 hours to reboot
+the screen.
+
+    0 */6 * * * reboot >/dev/null 2>&1
+
+You'll need to edit this file changing:
+
+* `NOW_PLAYING_PATH` - Path to your actively playing media folder.
+* `DEFAULT_PATH` - Path to your default archived folder.
+
+**Note:** The `NOW_PLAYING_PATH` shouldn't be a subdirectory
+of `DEFAULT_PATH`.  My configuration is:
+
+    NOW_PLAYING_PATH="/home/pjobson/Pictures/PLEX"
+    DEFAULT_PATH="/home/pjobson/Pictures/DEFAULT"
